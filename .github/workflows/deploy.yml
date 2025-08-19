@@ -1,0 +1,56 @@
+name: OpenCart CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify Docker installation
+        run: docker --version
+
+      - name: Install Make
+        run: sudo apt-get update && sudo apt-get install -y make
+
+      - name: Initialize submodules
+        run: |
+          git submodule update --init --recursive
+
+      - name: Initialize project
+        run: ls && make init
+        working-directory: ./opencart
+
+      - name: Build Docker images
+        run: make build
+        working-directory: ./opencart
+
+      - name: Start services
+        run: make up -d
+        working-directory: ./opencart
+
+      - name: Wait for service to start
+        run: |
+          echo "Waiting for service on port 80..."
+          for i in {1..30}; do
+            if nc -zv localhost 80; then
+              echo "Service is running on port 80"
+              exit 0
+            fi
+            echo "Retrying in 5s..."
+            sleep 5
+          done
+          echo "Service did not start in time" >&2
+          exit 1
+
+      - name: Deploy (todo)
+        run: echo "todo deploy"
