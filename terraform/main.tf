@@ -80,6 +80,9 @@ resource "kubernetes_deployment" "opencart" {
     template {
       metadata {
         labels = { app = "opencart" }
+        annotations = {
+          "kubectl.kubernetes.io/restartedAt" = timestamp()
+        }
       }
 
       spec {
@@ -90,11 +93,14 @@ resource "kubernetes_deployment" "opencart" {
           port {                
             container_port = 80
           }
+
+          image_pull_policy = "Always"
         }
       }
     }
   }
 }
+
 
 resource "kubernetes_service" "opencart" {
   metadata {
