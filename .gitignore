@@ -1,0 +1,4 @@
+opencart
+terraform/*
+!terraform/main.tf
+opencart.zip

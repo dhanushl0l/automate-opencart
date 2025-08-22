@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    container_name: opencart-web
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: opencart-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: opencart
+      MYSQL_USER: opencartuser
+      MYSQL_PASSWORD: opencartpass
+    ports:
+      - "3306:3306"
