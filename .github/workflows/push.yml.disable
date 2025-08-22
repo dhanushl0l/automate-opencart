@@ -1,5 +1,11 @@
 name: Terraform EKS Deployment
 
+on:
+  workflow_run:
+    workflows: ["OpenCart build image"]
+    types:
+      - completed
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
