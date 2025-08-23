@@ -14,4 +14,4 @@ This project is aimed at building a **Docker image for OpenCart** and deploying 
 
 ## Usage
 1. **The github workflow build and publish the image on push**  
-1. **Use teraform to deploy the app on EKS**  
+1. **Use terraform to deploy the app on EKS**  
