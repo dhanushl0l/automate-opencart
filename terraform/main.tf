@@ -63,6 +63,15 @@ data "aws_eks_cluster_auth" "ascode" {
   name = module.eks.cluster_name
 }
 
+data "aws_secretsmanager_secret_version" "opencart_db" {
+  secret_id = "opencart-db-secret"
+}
+
+locals {
+  db_secret = jsondecode(data.aws_secretsmanager_secret_version.opencart_db.secret_string)
+}
+
+
 resource "kubernetes_deployment" "opencart" {
   metadata {
     name      = "opencart"
@@ -119,6 +128,14 @@ resource "kubernetes_service" "opencart" {
   }
 }
 
+data "aws_secretsmanager_secret_version" "opencart_db" {
+  secret_id = "opencart-db-secret"
+}
+
+locals {
+  db_secret = jsondecode(data.aws_secretsmanager_secret_version.opencart_db.secret_string)
+}
+
 resource "kubernetes_deployment" "opencart_db" {
   metadata {
     name      = "opencart-db"
@@ -133,10 +150,7 @@ resource "kubernetes_deployment" "opencart_db" {
     }
 
     template {
-      metadata {
-        labels = { app = "opencart-db" }
-      }
-
+      metadata { labels = { app = "opencart-db" } }
       spec {
         container {
           name  = "mysql"
@@ -144,7 +158,7 @@ resource "kubernetes_deployment" "opencart_db" {
 
           env {
             name  = "MYSQL_ROOT_PASSWORD"
-            value = "rootpassword"
+            value = local.db_secret.root_password
           }
           env {
             name  = "MYSQL_DATABASE"
@@ -152,16 +166,14 @@ resource "kubernetes_deployment" "opencart_db" {
           }
           env {
             name  = "MYSQL_USER"
-            value = "opencartuser"
+            value = local.db_secret.username
           }
           env {
             name  = "MYSQL_PASSWORD"
-            value = "opencartpass"
+            value = local.db_secret.user_password
           }
 
-          port {
-            container_port = 3306
-          }
+          port { container_port = 3306 }
         }
       }
     }

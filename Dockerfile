@@ -35,7 +35,6 @@ RUN mkdir -p /var/www/storage/{cache,logs,download,upload,session,backup,marketp
     && mkdir -p /var/www/html/system/storage/{logs,cache,download,upload} \
     && chmod -R 0777 /var/www/html/system/storage/{logs,cache,download,upload}
 
-
 EXPOSE 80
 
 CMD ["apache2-foreground"]
